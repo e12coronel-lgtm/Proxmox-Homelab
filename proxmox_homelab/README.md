@@ -18,7 +18,7 @@ I used gear I already owned on purpose. Part of the point was proving you do not
 
 | Component | Detail |
 |-----------|--------|
-| Machine | CyberPowerPC C Series, AMD FX-8320 eight-core, 16 GB RAM, 1.81 TB drive |
+| Machine | AMD FX-8320 eight-core, 16 GB RAM, 1.81 TB drive |
 | Hypervisor | Proxmox VE 9.1.1 |
 | Management | MacBook Pro M1, used to access Proxmox remotely |
 | Secondary | Intel i5-7400 desktop, used only for flashing install media |
