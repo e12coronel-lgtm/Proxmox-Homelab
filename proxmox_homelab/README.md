@@ -43,7 +43,7 @@ Inside Proxmox I created two virtual bridges. vmbr0 connects to the physical net
 
 The design is router on a stick. pfSense has one interface on vmbr0 facing the home network (WAN) and one on vmbr1 facing the lab (LAN). It hands out DHCP addresses to the lab, does NAT so lab machines can reach the internet, forwards DNS, and enforces the firewall rules that keep the two networks apart. I chose this over a full edge-firewall setup on purpose. If pfSense breaks, my home network and the rest of the lab keep running, and it is simpler to manage while I am still learning. Moving to a true edge firewall is a later exercise.
 
-![Network diagram](diagrams/network-diagram.png)
+![Network diagram](diagrams/Network_Diagram.drawio.png)
 
 ## Phase 1: Proxmox
 
