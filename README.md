@@ -43,7 +43,7 @@ Inside Proxmox I created two virtual bridges. vmbr0 connects to the physical net
 
 The design is router on a stick. pfSense has one interface on vmbr0 facing the home network (WAN) and one on vmbr1 facing the lab (LAN). It hands out DHCP addresses to the lab, does NAT so lab machines can reach the internet, forwards DNS, and enforces the firewall rules that keep the two networks apart. I chose this over a full edge-firewall setup on purpose. If pfSense breaks, my home network and the rest of the lab keep running, and it is simpler to manage while I am still learning. Moving to a true edge firewall is a later exercise.
 
-![Network diagram](diagrams/Network_Diagram.drawio.png)
+![Network diagram](proxmox_homelab/diagrams/Network_Diagram.drawio.png)
 
 ## Phase 1: Proxmox
 
@@ -51,7 +51,7 @@ Proxmox VE installed directly on the bare metal of the AMD desktop. This is the 
 
 The only real obstacle was the BIOS issue above. My first VM start failed with a KVM virtualization error, and the cause was SVM being disabled. Enabled it, rebooted, and VMs started fine. A good early reminder that the hardware layer matters as much as the software.
 
-![Proxmox dashboard](screenshots/phase1/proxmox_dashboard.png)
+![Proxmox dashboard](proxmox_homelab/screenshots/phase1/proxmox_dashboard.png)
 
 ## Phase 2: Network and pfSense
 
@@ -61,8 +61,8 @@ pfSense runs on FreeBSD, and I found out fast that it does not always play nice 
 
 To prove the chain worked end to end, I cloned an Ubuntu VM onto the lab network and reached the internet from it. That one successful ping confirmed DHCP, NAT, DNS, and the firewall were all doing their jobs together.
 
-![pfSense dashboard](screenshots/phase2/pfsense_dashboard.png)
-![pfSense interfaces](screenshots/phase2/pfsense_wan_interface.png)
+![pfSense dashboard](proxmox_homelab/screenshots/phase2/pfsense_dashboard.png)
+![pfSense interfaces](proxmox_homelab/screenshots/phase2/pfsense_wan_interface.png)
 
 ## Phase 3: Windows domain
 
@@ -78,8 +78,8 @@ After install I renamed the machine to DC01 and gave it a static address of 10.1
 
 Since this is a closed lab and not production, I relaxed the default password policy through Group Policy so I could use simple passwords for testing. That is a trade-off you would never make in production but it is reasonable in a lab.
 
-![Server Manager roles](screenshots/phase3/dc01_server_manager.png)
-![DC01 static IP](screenshots/phase3/dc01_ipconfig_all.png)
+![Server Manager roles](proxmox_homelab/screenshots/phase3/dc01_server_manager.png)
+![DC01 static IP](proxmox_homelab/screenshots/phase3/dc01_ipconfig_all.png)
 
 ### The Windows 11 client (win-client01)
 
@@ -91,8 +91,8 @@ The real lesson came at the domain join. My first attempt failed with an error t
 
 The fix was to point the client's DNS straight at the domain controller (10.10.10.10) instead of the firewall. I confirmed with nslookup and ping that DC01 was answering for lab.local, tried the join again, and it worked. After a restart the login screen showed it signing in to the LAB domain, and I logged in with a domain account, which proved the whole authentication chain was working.
 
-![Domain join confirmation](screenshots/phase3/winclient_domain_join.png)
-![Login to LAB domain](screenshots/phase3/winclient_login_lab.png)
+![Domain join confirmation](proxmox_homelab/screenshots/phase3/winclient_domain_join.png)
+![Login to LAB domain](proxmox_homelab/screenshots/phase3/winclient_login_lab.png)
 
 ### Organizing Active Directory
 
@@ -107,13 +107,13 @@ With the domain working I built a clean structure instead of leaving everything 
 
 I created two users (luser01 in LabUsers, ladmin01 in Admins), put each in a matching security group, and moved the client computer object out of the default Computers container into Workstations so it would pick up the right policies. The domain controller itself stays in the built-in Domain Controllers container, which is the correct behavior, so I left it there.
 
-![Active Directory structure](screenshots/phase3/dc01_aduc_ous_and_groups.png)
+![Active Directory structure](proxmox_homelab/screenshots/phase3/dc01_aduc_ous_and_groups.png)
 
 ### Group Policy in action
 
 The last step tied it all together. I created a Group Policy Object called Lab-Baseline, linked it to the LabUsers OU, and enabled "Prohibit access to Control Panel and PC settings." On the client I forced a policy refresh, then tried to open Control Panel and got blocked, which is exactly what the policy is supposed to do. A policy report confirmed Lab-Baseline was applied. That is end-to-end proof that a setting I configured on the server reached out and changed the client.
 
-![GPO blocking Control Panel](screenshots/phase3/winclient_control_panel_restricted.png)
+![GPO blocking Control Panel](proxmox_homelab/screenshots/phase3/winclient_control_panel_restricted.png)
 
 ## Problems I solved
 
